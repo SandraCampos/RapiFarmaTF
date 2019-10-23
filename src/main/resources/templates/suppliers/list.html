@@ -8,20 +8,20 @@
 	<div class="container">
 
 		<div class="card" style="max-width: 100%;">
-			<div class="card-header">Maintenance Suppliers</div>
+			<div class="card-header">Mantenimiento Proveedores</div>
 			<div class="card-body">
 
 				<nav class="navbar navbar-light bg-light">
-					<a th:href="@{/suppliers/new}" class="btn btn-primary">New</a>
+					<a th:href="@{/suppliers/new}" class="btn btn-primary">Nuevo</a>
 					<form th:action="@{/suppliers/search}" method="GET">
 						<div class="form-row align-items-center">
 							<div class="col-auto">
-								<label class="sr-only" for="inputName">Name</label>
+								<label class="sr-only" for="inputName">Nombre</label>
 								<input id="inputName" type="text" class="form-control" name="name"
 									placeholder="Search By Name">
 							</div>
 							<div class="col-auto">
-								<button type="submit" class="btn btn-primary">Search</button>
+								<button type="submit" class="btn btn-primary">Buscar</button>
 							</div>
 						</div>					
 					</form>
@@ -31,13 +31,13 @@
 					<thead>
 						<tr>
 							<th scope="col">#</th>
-							<th>Name</th>
-							<th>Adress</th>
+							<th>Nombre</th>
+							<th>Dirección</th>
 							<th>Email</th>
-							<th>Phone</th>
-							<th>Contact</th>
+							<th>Teléfono</th>
+							<th>Contacto</th>
 							<th>RUC</th>
-							<th>Edit</th>
+							<th>Editar</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -51,7 +51,7 @@
 							<td th:text="${supplier.contact}">HAMP</td>
 							<td th:text="${supplier.ruc}">HAMP</td>
 							<td>
-								<a th:href="@{'/suppliers/edit/'+ ${supplier.id}}" class="btn btn-success">Edit</a>
+								<a th:href="@{'/suppliers/edit/'+ ${supplier.id}}" class="btn btn-success">Editar</a>
 							</td>
 						</tr>
 					</tbody>
