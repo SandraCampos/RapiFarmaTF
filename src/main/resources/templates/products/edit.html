@@ -1,0 +1,78 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:include="fragments/head"></th:block>
+
+<body>
+
+	<th:block th:include="fragments/navbar"></th:block>
+	<div class="container">
+
+		<div class="card" style="max-width: 100%;">
+			<div class="card-header">Actualizar Producto</div>
+			<div class="card-body">
+
+				<form th:object="${product}" th:action="@{/products/update/{id}(id=${product.id})}"
+					th:method="post">
+					<div class="form-group">
+						<input type="hidden" class="form-control" th:field="*{id}" />
+					</div>
+
+					<div class="form-group">
+						<label for="name">Nombre</label> <input type="text" class="form-control" id="name"
+							aria-describedby="name" th:field="*{name}" placeholder="type here ..." />
+					</div>
+
+
+					<div class="form-group">
+						<label for="unit">Unidad de Medida</label> <input type="text" class="form-control" id="unit"
+							aria-describedby="unit" th:field="*{unit}" placeholder="type here ..." />
+					</div>
+
+					<div class="form-group">
+						<label for="location">Ubicación</label> <input type="text" class="form-control" id="location"
+							aria-describedby="location" th:field="*{location}" placeholder="type here ..." />
+					</div>
+
+					<div class="form-group">
+						<label for="price">Precio</label> <input type="text" class="form-control" id="price"
+							aria-describedby="price" th:field="*{price}" placeholder="type here ..." />
+					</div>
+
+					<div class="form-group">
+						<label for="stock">Stock</label> <input type="text" class="form-control" id="stock"
+							aria-describedby="stock" th:field="*{stock}" placeholder="type here ..." />
+					</div>
+
+					<div class="form-group">
+						<label for="min_stock">Stock Mínimo</label> <input type="text" class="form-control" id="min_stock"
+							aria-describedby="min_stock" th:field="*{min_stock}" placeholder="type here ..." />
+					</div>
+
+					<div class="form-group">
+						<label for="category">Categoria</label> <select id="category" class="form-control"
+							th:field="*{categories}" multiple="multiple">
+							<option th:each="category:${categories}" th:text="${category.name}"
+								th:value="${category.id}"></option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="supplier">Proveedor</label> <select id="supplier" class="form-control"
+							th:field="*{supplier}">
+							<option th:each="supplier : ${suppliers}" th:text="${supplier.name}"
+								th:value="${supplier.id}"></option>
+						</select>
+					</div>
+
+					<a th:href="@{/products/}" class="btn btn-primary">Regresar</a>
+					<button type="submit" class="btn btn-success">Guardar</button>
+				</form>
+			</div>
+		</div>
+
+	</div>
+	<th:block th:include="fragments/scripts"></th:block>
+
+</body>
+
+</html>
