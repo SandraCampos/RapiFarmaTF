@@ -1,0 +1,64 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:include="fragments/head"></th:block>
+
+<body>
+
+	<th:block th:include="fragments/navbar"></th:block>
+	<div class="container">
+
+		<div class="card" style="max-width: 100%;">
+			<div class="card-header">Mantenimiento Ordenes</div>
+			<div class="card-body">
+
+				<nav class="navbar navbar-light bg-light">
+					<a th:href="@{/orders/new}" class="btn btn-primary">Nuevo</a>
+
+					<form th:action="@{/orders/search}" method="GET">
+						<div class="form-row align-items-center">
+							<div class="col-auto">
+								<label class="sr-only" for="inputName">Orden</label>
+								<input id="inputName" type="text" class="form-control" name="name"
+									placeholder="Search By Name">
+							</div>
+							<div class="col-auto">
+								<button type="submit" class="btn btn-primary">Buscar</button>
+							</div>
+						</div>					
+					</form>
+				</nav>
+
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th>Orden</th>
+							<th>Fecha Emisión</th>
+							<th>Fecha Recepción</th>
+							<th>Estado</th>							
+							<th>Editar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="order : ${orders}">
+
+							<td th:text="${order.id}">1</td>
+							<td th:text="${order.order}">HAMP</td>
+							<td th:text="${order.dateEmission}">HAMP</td>
+							<td th:text="${order.dateReception}">HAMP</td>
+							<td th:text="${order.state}">HAMP</td>							
+							<td>
+								<a th:href="@{'/orders/edit/'+ ${order.id}}" class="btn btn-success">Editar</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+	<th:block th:include="fragments/scripts"></th:block>
+
+</body>
+
+</html>
