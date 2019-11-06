@@ -8,9 +8,9 @@ public interface CrudService<T, ID> {
 	
 	public T getOneById(ID id) throws Exception;
 	
-	public Long create(T entity) throws Exception;
+	public T create(T entity) throws Exception;
 	
-	public void update(ID id, T entity) throws Exception;
+	public T update(ID id, T entity) throws Exception;
 	
 	public void delete(ID id) throws Exception;
 
