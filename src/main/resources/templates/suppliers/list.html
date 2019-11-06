@@ -1,67 +1,83 @@
-<!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <th:block th:include="fragments/head"></th:block>
 
-<body>
+<body class="index-page sidebar-collapse">
+	<th:block th:include="fragments/navbarTransparent"></th:block>
 
-	<th:block th:include="fragments/navbar"></th:block>
-	<div class="container">
+	<div class="main">
+		<th:block th:include="fragments/navbarPrimary"></th:block>
+		<div class="section">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-8 offset-md-2 col-sm-12">
 
-		<div class="card" style="max-width: 100%;">
-			<div class="card-header">Mantenimiento Proveedores</div>
-			<div class="card-body">
+						<div class="title">
+							<h2>Mantenimiento de Proveedores</h2>
+						</div>
+						
+						<nav class="navbar navbar-light bg-light">
+							<a th:href="@{/suppliers/new}" class="btn btn-primary">Nuevo</a>
+							<form th:action="@{/suppliers/search}" method="GET">
+								<div class="form-row align-items-center">
+									<div class="col-auto">
+										<label class="sr-only" for="inputName">Nombre</label>
+										<input id="inputName" type="text" class="form-control" name="name"
+											placeholder="Buscar por Nombre">
+									</div>
+									<div class="col-auto">
+										<button type="submit" class="btn btn-primary">Buscar</button>
+									</div>
+								</div>					
+							</form>
+						</nav>
 
-				<nav class="navbar navbar-light bg-light">
-					<a th:href="@{/suppliers/new}" class="btn btn-primary">Nuevo</a>
-					<form th:action="@{/suppliers/search}" method="GET">
-						<div class="form-row align-items-center">
-							<div class="col-auto">
-								<label class="sr-only" for="inputName">Nombre</label>
-								<input id="inputName" type="text" class="form-control" name="name"
-									placeholder="Search By Name">
-							</div>
-							<div class="col-auto">
-								<button type="submit" class="btn btn-primary">Buscar</button>
-							</div>
-						</div>					
-					</form>
-				</nav>
+						<table class="table table-responsive highlight">
+							<thead>
+								<tr>
+									<th>Codigo</th>
+									<th>Nombre</th>
+									<th>Direccion</th>
+									<th>Email</th>
+									<th>Telefono</th>
+									<th>Contacto</th>
+									<th>RUC</th>																	
+									<th></th>									
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="supplier : ${suppliersList}">
+									<td th:text="${supplier.id}"></td>
+									<td th:text="${supplier.name}"></td>
+									<td th:text="${supplier.adress}"></td>
+									<td th:text="${supplier.email}"></td>
+									<td th:text="${supplier.phone}"></td>
+									<td th:text="${supplier.contact}"></td>
+									<td th:text="${supplier.ruc}"></td>																	
 
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th scope="col">#</th>
-							<th>Nombre</th>
-							<th>Dirección</th>
-							<th>Email</th>
-							<th>Teléfono</th>
-							<th>Contacto</th>
-							<th>RUC</th>
-							<th>Editar</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="supplier : ${suppliers}">
-
-							<td th:text="${supplier.id}">1</td>
-							<td th:text="${supplier.name}">HAMP</td>
-							<td th:text="${supplier.adress}">HAMP</td>
-							<td th:text="${supplier.email}">HAMP</td>
-							<td th:text="${supplier.phone}">HAMP</td>
-							<td th:text="${supplier.contact}">HAMP</td>
-							<td th:text="${supplier.ruc}">HAMP</td>
-							<td>
-								<a th:href="@{'/suppliers/edit/'+ ${supplier.id}}" class="btn btn-success">Editar</a>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+									<td><a
+										th:href="@{/suppliers/{id}/edit(id=${supplier.id})}"><i
+											class="far fa-edit"></i></a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
+			<br> &nbsp;&nbsp;&nbsp; <br>
+
+			<div class="container">
+				<th:block th:include="fragments/paginationSupplier"></th:block>
+			</div>
+
 		</div>
-
 	</div>
-	<th:block th:include="fragments/scripts"></th:block>
 
+
+	<th:block th:include="fragments/footer"></th:block>
+
+	<th:block th:include="fragments/scripts"></th:block>
 </body>
 
 </html>
