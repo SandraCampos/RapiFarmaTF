@@ -1,10 +1,17 @@
 package com.hampcode.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hampcode.exception.ResourceNotFoundException;
 import com.hampcode.model.entity.Product;
 import com.hampcode.model.repository.ProductRepository;
 import com.hampcode.service.ProductService;
@@ -17,28 +24,29 @@ public class ProductServiceImpl implements ProductService{
 	
 	@Override	
 	public List<Product> getAll() throws Exception {
-		return this.productRepository.findAll();
-	}
-
-	@Override
-	public List<Product> fetchProductByName(String name) throws Exception {
-		return this.productRepository.fetchProductByName(name);
+		List<Product> products = new ArrayList<>();
+		this.productRepository.findAll().iterator().forEachRemaining(products::add);
+		return products;
 	}
 	
 	@Override
 	public Product getOneById(Long id) throws Exception {
-		return this.productRepository.findById(id).orElseThrow(
-				()->new RuntimeException("Product Not Found!"));
+		Optional<Product> product = this.productRepository.findById(id);
+		if(!product.isPresent()) {
+			throw new ResourceNotFoundException("There is no Product with ID = " + id);
+		}
+		return product.get();
 	}
 
 	@Override
-	public Long create(Product entity) throws Exception {
-		this.productRepository.save(entity);
-		return entity.getId();
+	@Transactional
+	public Product create(Product entity) throws Exception {
+		return this.productRepository.save(entity);	
 	}
 
 	@Override
-	public void update(Long id, Product entity) throws Exception {
+	@Transactional
+	public Product update(Long id, Product entity) throws Exception {
 		Product currentProduct = this.getOneById(id);
 		currentProduct.setName(entity.getName());
 		currentProduct.setLocation(entity.getLocation());
@@ -48,12 +56,23 @@ public class ProductServiceImpl implements ProductService{
 		currentProduct.setUnit(entity.getUnit());
 		currentProduct.setSupplier(entity.getSupplier());
 		currentProduct.setCategories(entity.getCategories());
-		this.productRepository.save(currentProduct);
+		return this.productRepository.save(currentProduct);
 	}
 
 	@Override
+	@Transactional
 	public void delete(Long id) throws Exception {
 		this.productRepository.deleteById(id);		
+	}
+
+	@Override
+	public Page<Product> findAll(Pageable pageable) throws Exception {
+		return this.productRepository.findAll(pageable);
+	}
+
+	@Override
+	public Page<Product> fetchByName(String name, Pageable pageable) throws Exception {
+		return this.productRepository.fetchByName(name, pageable);
 	}
 
 }
