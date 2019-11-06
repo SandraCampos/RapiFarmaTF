@@ -1,14 +1,22 @@
 package com.hampcode.controller;
 
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.hampcode.common.PageInitPaginationSupplier;
 import com.hampcode.model.entity.Supplier;
 import com.hampcode.service.SupplierService;
 
@@ -16,75 +24,77 @@ import com.hampcode.service.SupplierService;
 @RequestMapping("/suppliers")
 public class SupplierController {
 	
+	protected static final String SUPPLIER_ADD_FORM_VIEW = "suppliers/new";
+	protected static final String SUPPLIER_EDIT_FORM_VIEW = "suppliers/edit";
+	protected static final String SUPPLIER_PAGE_VIEW = "suppliers/list";
+	protected static final String SUPPLIER_VIEW = "index";
+
 	@Autowired
 	private SupplierService supplierService;
 	
+	@Autowired
+	private PageInitPaginationSupplier pageInitPaginationSupplier;
+	
 	@GetMapping
-	public String showAllSuppliers(Model model) {
-		try {
-			model.addAttribute("suppliers", this.supplierService.getAll());
-		}catch (Exception e) {
-			// TODO: handle exception
-		}
-		return "suppliers/list";
+	public ModelAndView getAllSuppliers (
+			@RequestParam("pageSize") Optional<Integer> pageSize,
+			@RequestParam("page") Optional<Integer> page) throws Exception{
+		return this.pageInitPaginationSupplier.initPagination(pageSize, page, SUPPLIER_PAGE_VIEW);
 	}
 	
 	@GetMapping("/search")
-	public String showSuppliersByName(@RequestParam("name") String name, Model model) {
-		try {
-			if(!name.isEmpty()) {
-				if(!this.supplierService.fetchSupplierByName(name).isEmpty()) {
-					model.addAttribute("suppliers", this.supplierService.fetchSupplierByName(name));
-				}else {					
-					model.addAttribute("suppliers", this.supplierService.getAll());
-				}
-			}else {				
-				model.addAttribute("suppliers", this.supplierService.getAll());
+	public ModelAndView getSupplierByName(
+			@RequestParam("name") String name,
+			@RequestParam("pageSize") Optional<Integer> pageSize,
+			@RequestParam("page") Optional<Integer> page) throws Exception{
+		
+		ModelAndView modelAndView;
+		
+		if(!name.isEmpty()) {
+			if(!this.pageInitPaginationSupplier.initPaginationByName(pageSize, page, SUPPLIER_PAGE_VIEW, name).isEmpty()) {
+				modelAndView = this.pageInitPaginationSupplier.initPaginationByName(pageSize, page, SUPPLIER_PAGE_VIEW, name);
+			}else {					
+				modelAndView = this.pageInitPaginationSupplier.initPagination(pageSize, page, SUPPLIER_PAGE_VIEW);
 			}
-		}catch (Exception e) {
-			model.addAttribute("error", e.getMessage());
-		}
-		return "suppliers/list";
+		}else {				
+			modelAndView = this.pageInitPaginationSupplier.initPagination(pageSize, page, SUPPLIER_PAGE_VIEW);
+		}		
+		return modelAndView;
 	}
 	
 	@GetMapping("/new")
-	public String newSupplierForm(Model model) {
-		try {
+	public String newSupplier(Model model) {		
+		if(!model.containsAttribute("supplier")) {
 			model.addAttribute("supplier", new Supplier());
-		}catch (Exception e) {
-			// TODO: handle exception
 		}
-		return "suppliers/new";
+		return SUPPLIER_ADD_FORM_VIEW;
 	}
 	
-	@PostMapping("/save")
-	public String saveNewSupplier(Supplier supplier) {
-		try {
-			this.supplierService.create(supplier);
-		}catch (Exception e) {
-			// TODO: handle exception
+	@PostMapping("/create")
+	public String createSupplier(@Valid Supplier supplier, BindingResult result, 
+			RedirectAttributes attr, Model model) throws Exception{		
+		if(result.hasErrors()) {
+			attr.addFlashAttribute("org.springframework.validation.BindingResult.supplier", result);
+			attr.addFlashAttribute("supplier", supplier);
+			return "redirect:/suppliers/new";
 		}
-		return "redirect:/suppliers";
+		Supplier newSupplier = this.supplierService.create(supplier);
+		model.addAttribute("supplier", newSupplier);		
+		return "redirect:/suppliers/";
 	}
 	
-	@GetMapping("/edit/{id}")
-	public String editSupplierForm(@PathVariable("id") long id, Model model) {
-		try {
-			Supplier supplier = this.supplierService.getOneById(id);
-			model.addAttribute("supplier", supplier);
-		}catch (Exception e) {
-			// TODO: handle exception
+	@GetMapping("{id}/edit")
+	public String editSupplier(@PathVariable(value = "id") Long supplierId, Model model) throws Exception{
+		if(!model.containsAttribute("supplier")) {
+			model.addAttribute("supplier", this.supplierService.getOneById(supplierId));
 		}
-		return "suppliers/edit";
+		return SUPPLIER_EDIT_FORM_VIEW;
 	}
 	
-	@PostMapping("/update/{id}")
-	public String updateSupplier(@PathVariable("id") long id, Supplier supplier) {
-		try {
-			this.supplierService.update(id, supplier);
-		}catch (Exception e) {
-			// TODO: handle exception
-		}
-		return "redirect:/suppliers";
+	@PostMapping(path = "/{id}/update")
+	public String updateSupplier(@PathVariable(value = "id") Long supplierId, Supplier supplier, Model model) throws Exception{
+		this.supplierService.update(supplierId, supplier);
+		model.addAttribute("supplier", this.supplierService.getOneById(supplierId));
+		return "redirect:/suppliers/";
 	}
 }
