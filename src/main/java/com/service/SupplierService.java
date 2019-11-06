@@ -1,9 +1,11 @@
 package com.hampcode.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.hampcode.model.entity.Supplier;
 
 public interface SupplierService extends CrudService<Supplier, Long>{
-	public List<Supplier> fetchSupplierByName(String name) throws Exception;
+	public Page<Supplier> findAll(Pageable pageable) throws Exception;
+	public Page<Supplier> fetchByName(String name, Pageable pageable) throws Exception;
 }
