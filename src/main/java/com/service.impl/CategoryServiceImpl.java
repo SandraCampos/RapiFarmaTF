@@ -1,12 +1,17 @@
 package com.hampcode.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hampcode.exception.ResourceNotFoundException;
 import com.hampcode.model.entity.Category;
 import com.hampcode.model.repository.CategoryRepository;
 import com.hampcode.service.CategoryService;
@@ -19,39 +24,49 @@ public class CategoryServiceImpl implements CategoryService{
 	
 	@Override
 	public List<Category> getAll() throws Exception {
-		return this.categoryRepository.findAll();
+		List<Category> categories = new ArrayList<>();
+		this.categoryRepository.findAll().iterator().forEachRemaining(categories::add);
+		return categories;
 	}
 	
-	@Override
-	public List<Category> fetchCategoryByName(String name) throws Exception {
-		return this.categoryRepository.fetchCategoryByName(name);
-	}
 	
 	@Override
 	public Category getOneById(Long id) throws Exception {
-		return this.categoryRepository.findById(id).orElseThrow(
-				()->new RuntimeException("Category Not Found!"));
+		Optional<Category> category = this.categoryRepository.findById(id);
+		if(!category.isPresent()) {
+			throw new ResourceNotFoundException("There is no Category with ID = " + id);
+		}
+		return category.get();
 	}
 
 	@Transactional
 	@Override
-	public Long create(Category entity) throws Exception {
-		this.categoryRepository.save(entity);
-		return entity.getId();
+	public Category create(Category entity) throws Exception {		
+		return this.categoryRepository.save(entity);
 	}
 
 	@Transactional
 	@Override
-	public void update(Long id, Category entity) throws Exception {
+	public Category update(Long id, Category entity) throws Exception {
 		Category currentCategory = this.getOneById(id);
 		currentCategory.setName(entity.getName());
-		this.categoryRepository.save(currentCategory);
+		return this.categoryRepository.save(currentCategory);
 	}
 
 	@Transactional
 	@Override
 	public void delete(Long id) throws Exception {
 		this.categoryRepository.deleteById(id);
+	}
+
+	@Override
+	public Page<Category> findAll(Pageable pageable) {
+		return this.categoryRepository.findAll(pageable);	
+	}
+
+	@Override
+	public Page<Category> fetchByName(String name, Pageable pageable) throws Exception {
+		return this.categoryRepository.fetchByName(name, pageable);
 	}
 
 }
