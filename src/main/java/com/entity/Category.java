@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "categories")
@@ -19,7 +21,9 @@ public class Category {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "name", nullable = false, length = 100)
+	@Size(max = 100, message = "El nombre de contener a lo más 100 caracteres")
+	@NotEmpty(message = "Ingrese una categoria")
+	@Column(name = "name", length = 100)
 	private String name;
 
 	@ManyToMany(mappedBy = "categories")
