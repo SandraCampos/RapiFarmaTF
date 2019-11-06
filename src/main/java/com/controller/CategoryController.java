@@ -1,89 +1,107 @@
 package com.hampcode.controller;
 
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.hampcode.common.PageInitPaginationCategory;
 import com.hampcode.model.entity.Category;
 import com.hampcode.service.CategoryService;
 
 @Controller
 @RequestMapping("/categories")
 public class CategoryController {
+		
+	protected static final String CATEGORY_ADD_FORM_VIEW = "categories/new";
+	protected static final String CATEGORY_EDIT_FORM_VIEW = "categories/edit";
+	protected static final String CATEGORY_PAGE_VIEW = "categories/list";
+	protected static final String INDEX_VIEW = "index";
 	
 	@Autowired
 	private CategoryService categoryService;
 	
+	@Autowired
+	private PageInitPaginationCategory pageInitPaginationCategory;
+	
 	@GetMapping
-	public String showAllCategories(Model model) {
-		try {
-			model.addAttribute("categories", this.categoryService.getAll());
-		}catch (Exception e) {
-			// TODO: handle exception
-		}
-		return "categories/list";
+	public ModelAndView getAllCategories(
+			@RequestParam("pageSize") Optional<Integer> pageSize,
+			@RequestParam("page") Optional<Integer> page) throws Exception{
+		return this.pageInitPaginationCategory.initPagination(pageSize, page, CATEGORY_PAGE_VIEW);
 	}
 	
 	@GetMapping("/search")
-	public String showCategoriesByName(@RequestParam("name") String name, Model model) {		
-		try {			
-			if(!name.isEmpty()) {
-				if(!this.categoryService.fetchCategoryByName(name).isEmpty()) {
-					model.addAttribute("categories", this.categoryService.fetchCategoryByName(name));
-				}else {					
-					model.addAttribute("categories", this.categoryService.getAll());
-				}
-			}else {				
-				model.addAttribute("categories", this.categoryService.getAll());
-			}			
-		}catch (Exception e) {			
-		}			
-		return "categories/list";
+	public ModelAndView getCategoryByName(
+			@RequestParam("name") String name,
+			@RequestParam("pageSize") Optional<Integer> pageSize,
+			@RequestParam("page") Optional<Integer> page) throws Exception{
+		
+		ModelAndView modelAndView;
+		
+		if(!name.isEmpty()) {
+			if(!this.pageInitPaginationCategory.initPaginationByName(pageSize, page, CATEGORY_PAGE_VIEW, name).isEmpty()) {
+				modelAndView = this.pageInitPaginationCategory.initPaginationByName(pageSize, page, CATEGORY_PAGE_VIEW, name);
+			}else {					
+				modelAndView = this.pageInitPaginationCategory.initPagination(pageSize, page, CATEGORY_PAGE_VIEW);
+			}
+		}else {				
+			modelAndView = this.pageInitPaginationCategory.initPagination(pageSize, page, CATEGORY_PAGE_VIEW);
+		}		
+		return modelAndView;
 	}
 	
 	@GetMapping("/new")
-	public String newCategoryForm(Model model) {
-		try {
-			model.addAttribute("category", new Category());			
-		}catch (Exception e) {
-			// TODO: handle exception
+	public String newCategory(Model model) {		
+		if(!model.containsAttribute("category")) {
+			model.addAttribute("category", new Category());
 		}
-		return "categories/new";
+		return CATEGORY_ADD_FORM_VIEW;
 	}
 	
-	@PostMapping("/save")
-	public String saveNewCategory(Category category) {
-		try {
-			this.categoryService.create(category);
-		}catch (Exception e) {
-			// TODO: handle exception
+	@PostMapping("/create")
+	public String createCategory(@Valid Category category, BindingResult result, 
+			RedirectAttributes attr, Model model) throws Exception{		
+		if(result.hasErrors()) {
+			attr.addFlashAttribute("org.springframework.validation.BindingResult.category", result);
+			attr.addFlashAttribute("category", category);
+			return "redirect:/categories/new";
 		}
-		return "redirect:/categories";
+		Category newCategory = this.categoryService.create(category);
+		model.addAttribute("category", newCategory);		
+		return "redirect:/categories/";
 	}
 	
-	@GetMapping("/edit/{id}")
-	public String editCategoryForm(@PathVariable("id") long id, Model model) {
-		try {
-			Category category = this.categoryService.getOneById(id);
-			model.addAttribute("category", category);			
-		}catch (Exception e) {
-			// TODO: handle exception
+	@GetMapping("{id}/edit")
+	public String editCategory(@PathVariable(value = "id") Long categoryId, Model model) throws Exception{
+		if(!model.containsAttribute("category")) {
+			model.addAttribute("category", this.categoryService.getOneById(categoryId));
 		}
-		return "categories/edit";
+		return CATEGORY_EDIT_FORM_VIEW;
 	}
 	
-	@PostMapping("/update/{id}")
-	public String updateCategory(@PathVariable("id") long id, Category category) {
-		try {
-			this.categoryService.update(id, category);
-		}catch (Exception e) {
-			// TODO: handle exception
+	@PostMapping(path = "/{id}/update")
+	public String updateCategory(@PathVariable(value = "id") Long categoryId, @Valid Category category, 
+			BindingResult result, RedirectAttributes attr, Model model) throws Exception{
+		if(result.hasErrors()) {
+			attr.addFlashAttribute("org.springframework.validation.BindingResult.category", result);
+			attr.addFlashAttribute("category", category);
+			return "redirect:/categories/{id}/edit(id=categoryId)";
 		}
-		return "redirect:/categories";
+		Category updateCategory = this.categoryService.update(categoryId, category);
+		model.addAttribute("category", updateCategory);
+		return "redirect:/categories/";
 	}
+	
 }
