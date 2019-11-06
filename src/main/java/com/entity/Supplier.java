@@ -6,6 +6,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "suppliers")
@@ -16,9 +18,13 @@ public class Supplier {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Size(max = 100, message = "El nombre de contener a lo más 100 caracteres")
+	@NotEmpty(message = "Ingrese nombre del proveedor")
 	@Column(name = "name", nullable = false, length = 100)
 	private String name;
 	
+	@Size(max = 255, message = "La dirección debe contener a lo más 255 caracteres")
+	@NotEmpty(message = "Ingrese una dirección")
 	@Column(name = "adress", nullable = false, length = 255)
 	private String adress;
 	
@@ -31,6 +37,8 @@ public class Supplier {
 	@Column(name = "contact", nullable = false, length = 100)
 	private String contact;
 	
+	@Size(min = 11, max = 11, message = "El RUC es de a lo máx 11 digitos")
+	@NotEmpty(message = "Ingrese RUC del proveedor")
 	@Column(name = "ruc", nullable = false, length = 11)
 	private String ruc;
 
@@ -91,3 +99,4 @@ public class Supplier {
 	}
 		
 }
+
