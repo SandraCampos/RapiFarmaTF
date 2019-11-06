@@ -1,38 +1,43 @@
-<!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <th:block th:include="fragments/head"></th:block>
-<body>
 
-	<th:block th:include="fragments/navbar"></th:block>
-	<div class="container">
+<body class="index-page sidebar-collapse">
+	<th:block th:include="fragments/navbarTransparent"></th:block>
 
-		<div class="card" style="max-width: 100%;">
-			<div class="card-header">Actualizar Categoria</div>
-			<div class="card-body">
+	<div class="main">
+		<th:block th:include="fragments/navbarPrimary"></th:block>
+		<div class="section">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-8 offset-md-2 col-sm-12">
+						<div class="title">
+							<h2>Editar Categoria</h2>
+						</div>
 
-		
-		
-			<form th:object="${category}"  th:action="@{/categories/update/{id}(id=${category.id})}" 
-					th:method="post">
-					<div class="form-group">
-						<input type="hidden" class="form-control" th:field="*{id}" />
+						<form th:object="${category}"
+							th:action="@{/categories/{id}/update(id=${category.id})}"
+							th:method="post">
+			
+							<div class="form-group">
+								<input th:field="*{name}" id="name" type="text"
+									class="form-control validate"> <label for="name">Categoria</label>	
+								<span class="text-danger errorMsg" 
+								th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>																	
+							</div>
+
+							<button type="submit" class="btn btn-dark">Save</button>
+							<a class="btn btn-primary" th:href="@{'/categories'}">Cancel</a>
+
+						</form>
 					</div>
-					
-					<div class="form-group">
-						<label for="name">Nombre</label> <input type="text"
-							class="form-control" id="name" aria-describedby="name"
-							th:field="*{name}" placeholder="type here ..." />
-					</div>
-					
-					
-					<a th:href="@{/categories/}" class="btn btn-primary">Regresar</a>
-					<button type="submit" class="btn btn-success">Guarar</button>
-				</form>
+				</div>
 			</div>
 		</div>
-
 	</div>
+	<th:block th:include="fragments/footer"></th:block>
 	<th:block th:include="fragments/scripts"></th:block>
-
 </body>
+
 </html>
