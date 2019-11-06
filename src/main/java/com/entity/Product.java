@@ -14,6 +14,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "products")
@@ -24,12 +26,18 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Size(max = 100, message = "El nombre debe contener a lo más 100 caracteres")
+	@NotEmpty(message = "Ingrese nombre del producto")
 	@Column(name = "name", nullable = false, length = 100)
 	private String name;
 	
+	@Size(max = 20, message = "La unidad de medidad debe contener a lo más 20 caracteres")
+	@NotEmpty(message = "Ingrese unidad de medida")
 	@Column(name = "unit", nullable = false, length = 20)
 	private String unit;
 	
+	@Size(max = 50, message = "El nombre de contener a lo más 50 caracteres")
+	@NotEmpty(message = "Ingrese la ubicación del producto")
 	@Column(name = "location", nullable = false, length = 50)
 	private String location;
 	
