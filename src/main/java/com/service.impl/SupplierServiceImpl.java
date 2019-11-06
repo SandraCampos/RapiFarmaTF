@@ -1,10 +1,15 @@
 package com.hampcode.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hampcode.exception.ResourceNotFoundException;
 import com.hampcode.model.entity.Supplier;
 import com.hampcode.model.repository.SupplierRepository;
 import com.hampcode.service.SupplierService;
@@ -17,28 +22,32 @@ public class SupplierServiceImpl implements SupplierService{
 	
 	@Override
 	public List<Supplier> getAll() throws Exception {
-		return this.supplierRepository.findAll();
+		List<Supplier> suppliers = new ArrayList<>();
+		this.supplierRepository.findAll().iterator().forEachRemaining(suppliers::add);
+		return suppliers;
 	}
 
 	@Override
-	public List<Supplier> fetchSupplierByName(String name) throws Exception {
-		return this.supplierRepository.fetchSupplierByName(name);
+	public Page<Supplier> fetchByName(String name, Pageable pageable) throws Exception {
+		return this.supplierRepository.fetchByName(name, pageable);
 	}
 	
 	@Override
 	public Supplier getOneById(Long id) throws Exception {
-		return this.supplierRepository.findById(id).orElseThrow(
-				()->new RuntimeException("Supplier Not Found!"));
+		Optional<Supplier> supplier = this.supplierRepository.findById(id);
+		if(!supplier.isPresent()) {
+			throw new ResourceNotFoundException("There is not Supplier with ID = " + id);
+		}
+		return supplier.get();
 	}
 
 	@Override
-	public Long create(Supplier entity) throws Exception {
-		this.supplierRepository.save(entity);
-		return entity.getId();
+	public Supplier create(Supplier entity) throws Exception {
+		return this.supplierRepository.save(entity);		
 	}
 
 	@Override
-	public void update(Long id, Supplier entity) throws Exception {
+	public Supplier update(Long id, Supplier entity) throws Exception {
 		Supplier currentSupplier = this.getOneById(id);
 		currentSupplier.setAdress(entity.getAdress());
 		currentSupplier.setContact(entity.getContact());
@@ -46,12 +55,17 @@ public class SupplierServiceImpl implements SupplierService{
 		currentSupplier.setName(entity.getName());
 		currentSupplier.setPhone(entity.getPhone());
 		currentSupplier.setRuc(entity.getRuc());
-		this.supplierRepository.save(currentSupplier);
+		return this.supplierRepository.save(currentSupplier);
 	}
 
 	@Override
 	public void delete(Long id) throws Exception {
 		this.supplierRepository.deleteById(id);
+	}
+	
+	@Override
+	public Page<Supplier> findAll(Pageable pageable) throws Exception{
+		return this.supplierRepository.findAll(pageable);
 	}
 
 }
